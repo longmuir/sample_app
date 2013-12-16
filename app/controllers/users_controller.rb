@@ -8,23 +8,24 @@ class UsersController < ApplicationController
     @users = User.paginate(page: params[:page])
   end
 
-	def show
-		@user = User.find(params[:id])	
-	end
+  def show
+    @user = User.find(params[:id]) 
+    @microposts = @user.microposts.paginate(page: params[:page]) 
+  end
 
   def new
-  	@user = User.new
+    @user = User.new
   end
 
   def create
-  	@user = User.new(params[:user])
-  	if @user.save
+    @user = User.new(params[:user])
+    if @user.save
       sign_in @user
-  		flash[:success] = "Welcome to Sample App!"
-  		redirect_to @user
-  	else
-  		render 'new'
-  	end
+      flash[:success] = "Welcome to Sample App!"
+      redirect_to @user
+    else
+      render 'new'
+    end
   end
 
   def edit
@@ -49,14 +50,6 @@ class UsersController < ApplicationController
   end
 
   private
-
-    def signed_in_user
-      unless signed_in?
-        store_location
-        redirect_to signin_url, notice: "Please sign in." unless signed_in?
-        #Listing 9.12
-      end
-    end
 
     def correct_user
       @user = User.find(params[:id])

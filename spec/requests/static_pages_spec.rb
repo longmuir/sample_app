@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "StaticPages" do
 
-	let(:base_title) {"Ruby on Rails Tutorial Sample App" }
+  let(:base_title) {"Ruby on Rails Tutorial Sample App" }
 
   subject { page }
   #Refactoring from Chapter 5, exercise 1:
@@ -18,6 +18,22 @@ describe "StaticPages" do
 
     it_should_behave_like "all static pages"
     it { should_not have_selector 'title', text:'| Home' }
+
+    describe "for signed-in users" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        sign_in user
+        visit root_path
+      end
+
+      it "should render the user's feed" do
+        user.feed.each do |item| 
+          page.should have_selector("li##{item.id}", text: item.content)
+        end
+      end
+    end
   end
 
   #Refactoring from Chapter 5.3.4
@@ -25,8 +41,8 @@ describe "StaticPages" do
   describe "Help page" do
     before { visit help_path }
 
-  	it { should have_selector('h1', text: 'Help') }
-  	it { should have_selector('title', text: full_title('Help')) }
+    it { should have_selector('h1', text: 'Help') }
+    it { should have_selector('title', text: full_title('Help')) }
   end
 
   # Note the first two describe blocks have been refactored..
@@ -35,30 +51,30 @@ describe "StaticPages" do
 
   describe "About page" do 
 
-  	it "should have the h1 'About Us'" do
-  	  visit about_path
-  	  page.should have_selector('h1', :text => 'About Us')
-  	end
+    it "should have the h1 'About Us'" do
+      visit about_path
+      page.should have_selector('h1', :text => 'About Us')
+    end
 
-  	it "should have the right title" do 
-  	  visit about_path
-  	  page.should have_selector('title',
-  		              :text => "#{base_title} | About Us")
+    it "should have the right title" do 
+      visit about_path
+      page.should have_selector('title',
+                    :text => "#{base_title} | About Us")
     end
   end
 
   describe "Contact page" do
 
-  	it "should have the content 'Contact'" do
-  		visit contact_path
-  		page.should have_selector('h1', :text=> 'Contact Us')
-  	end
+    it "should have the content 'Contact'" do
+      visit contact_path
+      page.should have_selector('h1', :text=> 'Contact Us')
+    end
 
-  	it "should have the right title" do
-  		visit contact_path
-  		page.should have_selector('title',
-  					  			:text => "#{base_title} | Contact")
-  	end
+    it "should have the right title" do
+      visit contact_path
+      page.should have_selector('title',
+                    :text => "#{base_title} | Contact")
+    end
   end
 
   it "sould have the right links on the layout" do
